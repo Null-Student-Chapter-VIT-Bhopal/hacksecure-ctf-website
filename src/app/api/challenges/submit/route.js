@@ -4,6 +4,7 @@ import Team from "@/lib/models/Team";
 import jwt from "jsonwebtoken";
 import logger from "@/utils/logger";
 import { rateLimit } from "@/lib/rateLimiter";
+import { NextResponse } from "next/server";
 
 const loginLimiter = rateLimit({ windowMs: 60_000, max: 5 });
 
