@@ -3,18 +3,34 @@ import logger from "@/utils/logger";
 import connectDB from "@/lib/db";
 import jwt from "jsonwebtoken";
 import { NextResponse } from "next/server";
+import { rateLimit } from "@/lib/rateLimiter";
+
+const loginLimiter = rateLimit({ windowMs: 60_000, max: 5 });
 
 export async function POST(req) {
   const forwarded = req.headers.get("x-forwarded-for");
   const ip = forwarded ? forwarded.split(",")[0] : "Unknown";
 
   try {
+    if (!loginLimiter(req)) {
+      logger.warn(`💀 Rate limit exceeded on Login attempt | IP: ${ip}`);
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Too many login attempts, try again later.",
+        },
+        { status: 429 }
+      );
+    }
+
     await connectDB();
 
     const { teamId, password } = await req.json();
 
     if (!teamId || !password) {
-      logger.warn(`⚠️ Login attempt with missing fields → [Team: ${teamId}] [IP: ${ip}]`);
+      logger.warn(
+        `⚠️ Login attempt with missing fields → [Team: ${teamId}] [IP: ${ip}]`
+      );
       return NextResponse.json(
         { success: false, message: "TeamID and Password required" },
         { status: 400 }
@@ -23,7 +39,9 @@ export async function POST(req) {
 
     const team = await teamSchema.findOne({ teamId }).select("+password");
     if (!team) {
-      logger.warn(`❌ Invalid Team Login Attempt → [Team: ${teamId}] [IP: ${ip}]`);
+      logger.warn(
+        `❌ Invalid Team Login Attempt → [Team: ${teamId}] [IP: ${ip}]`
+      );
       return NextResponse.json(
         { success: false, message: "Invalid TeamID.. Please Try Again" },
         { status: 400 }
@@ -32,7 +50,9 @@ export async function POST(req) {
 
     const isMatch = await team.matchPassword(password);
     if (!isMatch) {
-      logger.warn(`❌ Invalid Password Attempt → [Team: ${teamId}] [IP: ${ip}]`);
+      logger.warn(
+        `❌ Invalid Password Attempt → [Team: ${teamId}] [IP: ${ip}]`
+      );
       return NextResponse.json(
         { success: false, message: "Invalid Password.. Please Try Again" },
         { status: 400 }
@@ -45,7 +65,9 @@ export async function POST(req) {
       { expiresIn: "1h" }
     );
 
-    logger.info(`✅ TEAM LOGIN SUCCESS → Name="${team.teamName}" | TeamID=${team.teamId} | IP=${ip}`);
+    logger.info(
+      `✅ TEAM LOGIN SUCCESS → Name="${team.teamName}" | TeamID=${team.teamId} | IP=${ip}`
+    );
 
     return NextResponse.json({
       success: true,
@@ -57,9 +79,9 @@ export async function POST(req) {
       },
     });
   } catch (err) {
-    logger.error(`💀 Server error in /login | IP: ${ip} | Error: ${err.stack}`);
+    logger.error(`💀 Too Many request | IP: ${ip} | Error: ${err.stack}`);
     return NextResponse.json(
-      { success: false, message: "Internal server error" },
+      { success: false, message: "Too many Request..!" },
       { status: 500 }
     );
   }
