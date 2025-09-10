@@ -29,6 +29,7 @@ export default function Navbar() {
   const [isTeamDialogOpen, setIsTeamDialogOpen] = useState(false);
   const [teamData, setTeamData] = useState(null);
   const [isLoadingTeam, setIsLoadingTeam] = useState(false);
+  const [showImage, setShowImage] = useState(false);
   const pathname = usePathname();
 
   const { logout, isAuthenticated, user, role, token } = useAuth();
@@ -141,7 +142,11 @@ export default function Navbar() {
                       </span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Mail className="h-4 w-4 text-blue-400" />
+                      <Mail
+                        className="h-4 w-4 text-blue-400 "
+                        onClick={() => setShowImage(true)}
+                      />
+
                       <span className="text-slate-300 text-sm">
                         {teamData.leader.email}
                       </span>
@@ -196,6 +201,15 @@ export default function Navbar() {
               <div className="text-center py-8">
                 <Users className="h-12 w-12 text-slate-300 mx-auto mb-2" />
                 <p className="text-slate-200">No team data available</p>
+              </div>
+            )}
+            {showImage && (
+              <div className="flex justify-center mt-4">
+                <img
+                  src="/devnull.jpeg"
+                  alt="Preview"
+                  className="rounded-lg border border-white/20 max-h-64"
+                />
               </div>
             )}
           </div>

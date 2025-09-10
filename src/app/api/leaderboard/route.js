@@ -13,7 +13,7 @@ export async function GET(req) {
     let currentUser = null;
 
     const teams = await Team.find()
-      .sort({ score: -1 })
+      .sort({ score: -1, updatedAt: 1 })
       .select("score teamName teamId");
 
     if (authHeader && authHeader.startsWith("Bearer ")) {

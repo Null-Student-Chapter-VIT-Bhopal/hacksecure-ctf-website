@@ -60,7 +60,7 @@ export async function POST(req) {
     }
 
     const token = jwt.sign(
-      { userId: team._id, teamId: team.teamId, role: "user" },
+      { userId: team._id, teamId: team.teamId, role: "user",dialogPart2: "1T_M4K35_M3_PHY51C4LLY_1LL"  },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
