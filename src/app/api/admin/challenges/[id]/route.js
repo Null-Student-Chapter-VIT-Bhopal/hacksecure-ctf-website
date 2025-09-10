@@ -20,10 +20,8 @@ export async function DELETE(req, { params }) {
     await connectDB();
     const adminUser = await User.findById(decoded.userId);
 
-    console.log({ decoded, adminUser });
-    if (decoded.role === "sudo" && adminUser.role === "sudo") {
+    if (adminUser.role === "sudo") {
       try {
-        await connectDB();
 
         const { id } = await params;
         const { adminEmail, adminPassword } = await req.json();
@@ -114,10 +112,20 @@ export async function PUT(req, { params }) {
     const { id } = await params;
     const formData = await req.json();
 
+    const user = await User.findById(decoded.userId);
+    if (!user || user.role !== "sudo") {
+      return NextResponse.json(
+        { success: false, message: "Forbidden" },
+        { status: 403 }
+      );
+    }
+
     console.log("Challenge update attempt:", {
       challenge: id,
       user: decoded.userId,
     });
+
+    await connectDB();
 
     const challenge = await Challenge.findByIdAndUpdate(id, formData, {
       new: true,
