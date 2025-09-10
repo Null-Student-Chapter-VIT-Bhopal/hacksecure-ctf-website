@@ -125,7 +125,7 @@ export async function POST(req) {
       await challenge.save();
 
       logger.info(
-        `✅ Flag correct | Challenge: ${challenge.name} | Team: ${team.teamName} | New Score: ${team.score} | IP: ${ip}`
+        `✅ Flag correct | Challenge: ${challenge.name} | Submitted Flag: ${flag} | Team: ${team.teamName} | New Score: ${team.score} | IP: ${ip}`
       );
 
       return new Response(
@@ -138,7 +138,7 @@ export async function POST(req) {
       );
     } else {
       logger.info(
-        `❌ Incorrect flag submitted | Challenge: ${challenge.name} | Team: ${team.teamName} | IP: ${ip}`
+        `❌ Incorrect flag submitted | Challenge: ${challenge.name} | Submitted Flag: ${flag} | Team: ${team.teamName} | IP: ${ip}`
       );
       return new Response(
         JSON.stringify({ success: false, message: "Incorrect flag" }),
