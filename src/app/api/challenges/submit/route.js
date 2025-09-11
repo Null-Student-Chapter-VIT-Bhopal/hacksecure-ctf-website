@@ -117,21 +117,21 @@ export async function POST(req) {
 
     // Correct flag
     if (flag === challenge.flag) {
-      team.solvedChallenges.push(challengeId);
-      team.score += challenge.value;
-      await team.save();
+      // team.solvedChallenges.push(challengeId);
+      // team.score += challenge.value;
+      // await team.save();
 
-      challenge.solvedBy.push(decoded.userId);
-      await challenge.save();
+      // challenge.solvedBy.push(decoded.userId);
+      // await challenge.save();
 
       logger.info(
-        `✅ Flag correct | Challenge: ${challenge.name} | Submitted Flag: ${flag} | Team: ${team.teamName} | New Score: ${team.score} | IP: ${ip}`
+        `✅ TRIED SOLVING FLAG AFTER CHALLENGE END | Challenge: ${challenge.name} | Submitted Flag: ${flag} | Team: ${team.teamName} | New Score: ${team.score} | IP: ${ip}`
       );
 
       return new Response(
         JSON.stringify({
           success: true,
-          message: "Flag correct!",
+          message: "Flag Submission Ended",
           newScore: team.score,
         }),
         { status: 200, headers: { "Content-Type": "application/json" } }
@@ -141,7 +141,7 @@ export async function POST(req) {
         `❌ Incorrect flag submitted | Challenge: ${challenge.name} | Submitted Flag: ${flag} | Team: ${team.teamName} | IP: ${ip}`
       );
       return new Response(
-        JSON.stringify({ success: false, message: "Incorrect flag" }),
+        JSON.stringify({ success: false, message: "Flag Submission Ended" }),
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
